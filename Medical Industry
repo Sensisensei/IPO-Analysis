@@ -1,0 +1,90 @@
+import pandas as pd
+import numpy as np
+import math as ma
+import glob 
+from collections import Counter
+
+df=pd.concat([pd.read_csv(f) for f in glob.glob('*.csv')], axis=1) #Load all csv files
+df=df.drop(columns=['Open','High','Low','Volume','Adj Close','Date']) #Remove column
+
+df=df.dropna(axis=1,thresh=150)
+df=df.dropna(axis=0,thresh=18)## Keep only non nan values
+df
+
+rowmax=df.loc[df['Close'].idxmax()] 
+indexesmax=rowmax.index #Find which row inddex is the max at (=What trading day)
+indexesmax
+
+rowmin=df.loc[df['Close'].idxmin()]
+indexesmin=rowmin.index #Find what index is the min at
+indexesmin
+
+countermin30=0
+countermin60=0
+countermin90=0
+countermin120=0
+countermin155=0# Counters to count where are the min & max
+
+
+for i in range(0,len(indexesmin)):
+    if indexesmin[i]<=30:
+        countermin30=countermin30+1
+    if indexesmin[i]>30 and indexesmin[i]<=60:
+        countermin60=countermin60+1
+    if indexesmin[i]>60 and indexesmin[i]<=90:
+        countermin90=countermin90+1
+    if indexesmin[i]>90 and indexesmin[i]<=120:
+        countermin120=countermin120+1
+    if indexesmin[i]>120 and indexesmin[i]<=155:
+        countermin155=countermin155+1
+    #Bunch of conditions to see in whgich ranges are the min & max
+    
+    
+    summin=countermin30+countermin60+countermin90+countermin120+countermin155
+permin30=(countermin30/summin)*100
+permin60=(countermin60/summin)*100
+permin90=(countermin90/summin)*100
+permin120=(countermin120/summin)*100
+permin155=(countermin155/summin)*100
+print('After IPO, minimal value reached between','\n')
+print('0-30 days',permin30,'%\n','30-60 days',permin60,'%\n','60-90 days',permin90,'%\n','90-120 days',permin120,'%\n','120-155 days',permin155) #Find percentage values #Find percentage values
+
+countermax30=0
+countermax60=0
+countermax90=0
+countermax120=0
+countermax155=0 #Counters to count where are the min & max
+
+
+for i in range(0,len(indexesmax)):
+    if indexesmax[i]<=30:
+        countermax30=countermax30+1
+    if indexesmax[i]>30 and indexesmax[i]<=60:
+        countermax60=countermax60+1
+    if indexesmax[i]>60 and indexesmax[i]<=90:
+        countermax90=countermax90+1
+    if indexesmax[i]>90 and indexesmax[i]<=120:
+        countermax120=countermax120+1
+    if indexesmax[i]>120 and indexesmax[i]<=155:
+        countermax155=countermax155+1
+    #Bunch of conditions to see in which ranges are the min & max
+    
+    
+    summax=countermax30+countermax60+countermax90+countermax120+countermax155
+permax30=(countermax30/summax)*100
+permax60=(countermax60/summax)*100
+permax90=(countermax90/summax)*100
+permax120=(countermax120/summax)*100
+permax155=(countermax155/summax)*100
+print('After IPO, minimal value reached between','\n')
+print('0-30 days',permax30,'%\n','30-60 days',permax60,'%\n','60-90 days',permax90,'%\n','90-120 days',permax120,'%\n','120-155 days',permax155) #Find percentage values #Find percentage values
+
+print('After IPO, minimal value reached between','\n')
+print('0-30 days',permin30,'%\n','30-60 days',permin60,'%\n','60-90 days',permin90,'%\n','90-120 days',permin120,'%\n','120-155 days',permin155) #Find percentage values #Find percentage values
+print('After IPO, minimal value reached between','\n')
+print('0-30 days',permax30,'%\n','30-60 days',permax60,'%\n','60-90 days',permax90,'%\n','90-120 days',permax120,'%\n','120-155 days',permax155) #Find percentage values #Find percentage values
+
+normalized_df=(df-df.min())/(df.max()-df.min()) #Normalize data
+normalized_df
+
+normalized_df.mean(axis=1).plot(x='Number of trading days',y="Average normalized price",title="General trend followed by medical stocks after IPO") #Plot average trend followed by stocks
